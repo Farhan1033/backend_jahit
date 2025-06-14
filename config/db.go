@@ -13,9 +13,11 @@ import (
 var DB *gorm.DB
 
 func ConnectDatabase() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	if os.Getenv("ENV") != "production" {
+		err := godotenv.Load()
+		if err != nil {
+			log.Println("Gagal memuat file .env, lanjut pakai environment bawaan")
+		}
 	}
 
 	host := os.Getenv("DB_HOST")
@@ -36,5 +38,5 @@ func ConnectDatabase() {
 	}
 
 	DB = db
-	fmt.Println("Database terhubung dengan PostgreSQL")
+	fmt.Println("Database berhasil terhubung")
 }
