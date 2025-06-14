@@ -12,9 +12,11 @@ import (
 func main() {
 	config.ConnectDatabase()
 
+	gin.SetMode(gin.ReleaseMode)
+
 	r := gin.Default()
 
-	if err := r.SetTrustedProxies([]string{"127.0.0.1"}); err != nil {
+	if err := r.SetTrustedProxies([]string{"0.0.0.0"}); err != nil {
 		panic(fmt.Sprintf("Gagal set trusted proxy: %v", err))
 	}
 
@@ -28,5 +30,5 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	r.Run(":" + port)
+	r.Run("0.0.0.0:" + port)
 }
