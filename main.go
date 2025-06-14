@@ -1,8 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"sistem-ukuran-jahit/config"
-	"sistem-ukuran-jahit/models"
 	"sistem-ukuran-jahit/routes"
 
 	"github.com/gin-gonic/gin"
@@ -10,10 +11,22 @@ import (
 
 func main() {
 	config.ConnectDatabase()
-	config.DB.AutoMigrate(&models.Measurement{})
 
 	r := gin.Default()
+
+	if err := r.SetTrustedProxies([]string{"127.0.0.1"}); err != nil {
+		panic(fmt.Sprintf("Gagal set trusted proxy: %v", err))
+	}
+
+	r.GET("/kaithhealthcheck", func(c *gin.Context) {
+		c.JSON(200, gin.H{"message": "OK"})
+	})
+
 	routes.SetupRoutes(r)
 
-	r.Run(":8080")
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	r.Run(":" + port)
 }
