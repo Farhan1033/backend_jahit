@@ -12,7 +12,8 @@ import (
 func main() {
 	config.ConnectDatabase()
 
-	gin.SetMode(gin.ReleaseMode)
+	// gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.DebugMode)
 
 	r := gin.Default()
 
@@ -27,6 +28,6 @@ func main() {
 	routes.SetupRoutes(r)
 
 	port := os.Getenv("PORT")
-	
+
 	r.Run("0.0.0.0:" + port)
 }
