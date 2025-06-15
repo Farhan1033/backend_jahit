@@ -15,25 +15,26 @@ func CreateMeasurement(measurement *models.Measurement) error {
 	return config.DB.Create(measurement).Error
 }
 
-func UpdateMeasurement(id_customer uint, input *models.Measurement) error {
+func UpdateMeasurement(id uint, input *models.Measurement) error {
 	var measurement models.Measurement
 
-	if err := config.DB.First(&measurement, "id_customer = ?", id_customer).Error; err != nil {
+	if err := config.DB.First(&measurement, "id = ?", id).Error; err != nil {
 		return err
 	}
 
-	measurement.CustomerName = input.CustomerName
-	measurement.Gender = input.Gender
+	measurement.Type = input.Type
 	measurement.Chest = input.Chest
 	measurement.Waist = input.Waist
-	measurement.Hip = input.Hip
-	measurement.ArmLength = input.ArmLength
-	measurement.ShirtLength = input.ShirtLength
+	measurement.Hips = input.Hips
+	measurement.Shoulder = input.Shoulder
+	measurement.Length = input.Length
+	measurement.Sleeve = input.Sleeve
+	measurement.Note = input.Note
 	measurement.UpdatedAt = input.UpdatedAt
 
 	return config.DB.Save(&measurement).Error
 }
 
-func DeleteMeasurement(id_customer uint) error {
-	return config.DB.Delete(&models.Measurement{}, "id_customer = ?", id_customer).Error
+func DeleteMeasurement(id uint) error {
+	return config.DB.Delete(&models.Measurement{}, "id = ?", id).Error
 }

@@ -10,8 +10,12 @@ func SetupRoutes(router *gin.Engine) {
 	api := router.Group("/api")
 	{
 		api.GET("/measurements", controllers.GetMeasurements)
+		api.GET("/measurement/customer", controllers.GetMeasurementsByCustomerName)
 		api.POST("/measurements", controllers.CreateMeasurement)
-		api.PUT("/measurements/:id_customer", controllers.UpdateMeasurement)
-		api.DELETE("/measurements/:id_customer", controllers.DeleteMeasurement)
+		api.PUT("/measurements/:id", controllers.UpdateMeasurement)
+		api.DELETE("/measurements/:id", controllers.DeleteMeasurement)
+		api.POST("/add-customer", controllers.CreateCustomer)
+		api.GET("/customer", controllers.GetAllCustomer)
+		api.DELETE("/delete-customer/:id", controllers.DeleteCustomer)
 	}
 }

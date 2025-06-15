@@ -2,7 +2,9 @@ package controllers
 
 import (
 	"net/http"
+	"sistem-ukuran-jahit/config"
 	"sistem-ukuran-jahit/models"
+	"sistem-ukuran-jahit/models/dto"
 	"sistem-ukuran-jahit/repositories"
 	"strconv"
 	"time"
@@ -11,21 +13,45 @@ import (
 )
 
 func GetMeasurements(c *gin.Context) {
-	data, err := repositories.GetAllMeasurements()
+	var measurements []models.Measurement
+
+	err := config.DB.Preload("Customer").Find(&measurements).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	type Response struct {
+	type ResponseData struct {
 		Message string      `json:"message"`
 		Data    interface{} `json:"data"`
 	}
 
-	c.JSON(http.StatusOK, Response{
+	var response []dto.MeasurementResponse
+
+	for _, m := range measurements {
+		r := dto.MeasurementResponse{
+			ID:        m.ID,
+			Name:      m.Customer.Name,
+			Phone:     m.Customer.Phone,
+			Type:      m.Type,
+			Chest:     m.Chest,
+			Waist:     m.Waist,
+			Hips:      m.Hips,
+			Shoulder:  m.Shoulder,
+			Length:    m.Length,
+			Sleeve:    m.Sleeve,
+			Note:      m.Note,
+			CreatedAt: m.CreatedAt.Format("2006-01-02 15:04"),
+			UpdatedAt: m.UpdatedAt.Format("2006-01-02 15:04"),
+		}
+		response = append(response, r)
+	}
+
+	c.JSON(http.StatusOK, ResponseData{
 		Message: "Berhasil menampilkan data",
-		Data:    data,
+		Data:    response,
 	})
+
 }
 
 func CreateMeasurement(c *gin.Context) {
@@ -53,7 +79,7 @@ func CreateMeasurement(c *gin.Context) {
 func UpdateMeasurement(c *gin.Context) {
 	var input models.Measurement
 
-	id := c.Param("id_customer")
+	id := c.Param("id")
 	parsedID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "Format ID tidak valid"})
@@ -71,14 +97,15 @@ func UpdateMeasurement(c *gin.Context) {
 	}
 
 	type MeasurementResponse struct {
-		CustomerName string  `json:"customer_name"`
-		Gender       string  `json:"gender"`
-		Chest        float64 `json:"chest"`
-		Waist        float64 `json:"waist"`
-		Hip          float64 `json:"hip"`
-		ArmLength    float64 `json:"arm_length"`
-		ShirtLength  float64 `json:"shirt_length"`
-		UpdatedAt    string  `json:"updated_at"`
+		Type      string  `json:"type"`
+		Chest     float32 `json:"chest"`
+		Waist     float32 `json:"waist"`
+		Hips      float32 `json:"hips"`
+		Shoulder  float32 `json:"shoulder"`
+		Length    float32 `json:"length"`
+		Sleeve    float32 `json:"sleeve"`
+		Note      string  `json:"note"`
+		UpdatedAt string  `json:"updated_at"`
 	}
 
 	type SuccessResponse struct {
@@ -89,14 +116,15 @@ func UpdateMeasurement(c *gin.Context) {
 	response := SuccessResponse{
 		Message: "Berhasil memperbarui data",
 		Data: MeasurementResponse{
-			CustomerName: input.CustomerName,
-			Gender:       input.Gender,
-			Chest:        input.Chest,
-			Waist:        input.Waist,
-			Hip:          input.Hip,
-			ArmLength:    input.ArmLength,
-			ShirtLength:  input.ShirtLength,
-			UpdatedAt:    time.Now().Format(time.RFC3339),
+			Type:      input.Type,
+			Chest:     input.Chest,
+			Waist:     input.Waist,
+			Hips:      input.Hips,
+			Shoulder:  input.Shoulder,
+			Length:    input.Length,
+			Sleeve:    input.Sleeve,
+			Note:      input.Note,
+			UpdatedAt: time.Now().Format(time.RFC3339),
 		},
 	}
 
@@ -107,10 +135,8 @@ type ErrorResponse struct {
 	Error string `json:"error"`
 }
 
-
-
 func DeleteMeasurement(c *gin.Context) {
-	id := c.Param("id_customer")
+	id := c.Param("id")
 	parsedID, err := strconv.ParseUint(id, 10, 32)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
@@ -128,5 +154,57 @@ func DeleteMeasurement(c *gin.Context) {
 
 	c.JSON(http.StatusOK, Response{
 		Message: "Berhasil menghapus data",
+	})
+}
+
+func GetMeasurementsByCustomerName(c *gin.Context) {
+	name := c.Query("name")
+
+	if name == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Query parameter 'name' wajib diisi"})
+		return
+	}
+
+	var measurements []models.Measurement
+
+	err := config.DB.
+		Joins("JOIN customers ON customers.id = measurements.customer_id").
+		Where("LOWER(customers.name) LIKE LOWER(?)", "%"+name+"%").
+		Preload("Customer").
+		Find(&measurements).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	var response []dto.MeasurementResponse
+	for _, m := range measurements {
+		r := dto.MeasurementResponse{
+			ID:        m.ID,
+			Name:      m.Customer.Name,
+			Phone:     m.Customer.Phone,
+			Type:      m.Type,
+			Chest:     m.Chest,
+			Waist:     m.Waist,
+			Hips:      m.Hips,
+			Shoulder:  m.Shoulder,
+			Length:    m.Length,
+			Sleeve:    m.Sleeve,
+			Note:      m.Note,
+			CreatedAt: m.CreatedAt.Format("2006-01-02 15:04"),
+			UpdatedAt: m.UpdatedAt.Format("2006-01-02 15:04"),
+		}
+		response = append(response, r)
+	}
+
+	type ResponseData struct {
+		Message string      `json:"message"`
+		Data    interface{} `json:"data"`
+	}
+
+	c.JSON(http.StatusOK, ResponseData{
+		Message: "Berhasil menampilkan data",
+		Data: response,
 	})
 }
