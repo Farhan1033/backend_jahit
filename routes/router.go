@@ -13,5 +13,7 @@ func SetupRoutes(router *gin.Engine) {
 		api.POST("/measurements", controllers.CreateMeasurement)
 		api.PUT("/measurements/:id_customer", controllers.UpdateMeasurement)
 		api.DELETE("/measurements/:id_customer", controllers.DeleteMeasurement)
+		api.POST("/add-customer", controllers.CreateCustomer)
+		api.GET("/customer", controllers.GetAllCustomer)
 	}
 }
