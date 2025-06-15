@@ -11,4 +11,6 @@ type Customer struct {
 	Name      string    `gorm:"type:varchar(100);not null" json:"name"`
 	Phone     string    `gorm:"type:varchar(15);not null" json:"phone"`
 	CreatedAt time.Time `json:"created_at"`
+
+	Measurement []Measurement `json:"measurement"`
 }

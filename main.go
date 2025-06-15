@@ -10,8 +10,7 @@ import (
 
 func main() {
 	config.ConnectDatabase()
-	config.DB.AutoMigrate(&models.Customer{})
-	config.DB.AutoMigrate(&models.Measurement{})
+	config.DB.AutoMigrate(&models.Customer{}, &models.Measurement{})
 
 	gin.SetMode(gin.DebugMode)
 	// gin.SetMode(gin.ReleaseMode)
