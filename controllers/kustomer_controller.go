@@ -52,3 +52,25 @@ func CreateCustomer(c *gin.Context) {
 		Data:    customer,
 	})
 }
+
+func DeleteCustomer(c *gin.Context) {
+	id := c.Param("id")
+	parsedID, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID format"})
+		return
+	}
+
+	if err := repositories.DeleteCustomer(parsedID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	type Response struct {
+		Message string `json:"message"`
+	}
+
+	c.JSON(http.StatusOK, Response{
+		Message: "Berhasil menghapus data",
+	})
+}
