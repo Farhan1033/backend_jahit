@@ -16,5 +16,6 @@ func SetupRoutes(router *gin.Engine) {
 		api.DELETE("/measurements/:id", controllers.DeleteMeasurement)
 		api.POST("/add-customer", controllers.CreateCustomer)
 		api.GET("/customer", controllers.GetAllCustomer)
+		api.DELETE("/delete-customer/:id", controllers.DeleteCustomer)
 	}
 }
