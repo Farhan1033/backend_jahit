@@ -20,12 +20,12 @@ func ConnectDatabase() {
 		}
 	}
 
-	host := os.Getenv("DB_HOST_DEBUG")
-	port := os.Getenv("DB_PORT_DEBUG")
-	user := os.Getenv("DB_USER_DEBUG")
-	pass := os.Getenv("DB_PASSWORD_DEBUG")
-	dbname := os.Getenv("DB_NAME_DEBUG")
-	timezone := os.Getenv("DB_TIMEZONE_DEBUG")
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	pass := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+	timezone := os.Getenv("DB_TIMEZONE")
 
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=%s",

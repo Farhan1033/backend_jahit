@@ -12,8 +12,8 @@ func main() {
 	config.ConnectDatabase()
 	config.DB.AutoMigrate(&models.Customer{}, &models.Measurement{})
 
-	gin.SetMode(gin.DebugMode)
-	// gin.SetMode(gin.ReleaseMode)
+	// gin.SetMode(gin.DebugMode)
+	gin.SetMode(gin.ReleaseMode)
 
 	r := gin.Default()
 
